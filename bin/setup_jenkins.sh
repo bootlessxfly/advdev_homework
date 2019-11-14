@@ -14,9 +14,9 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 
 # Set up Jenkins with sufficient resources
 # TBD
-oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=4Gi --param VOLUME_CAPACITY=4Gi --param DISABLE_ADMINISTRATIVE_MONITORS=true
+oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=4Gi --param VOLUME_CAPACITY=4Gi --param DISABLE_ADMINISTRATIVE_MONITORS=true -n ${GUID}-jenkins
 
-oc set resources dc jenkins --limits=memory=4Gi,cpu=2 --requests=memory=2Gi,cpu=500m
+oc set resources dc jenkins --limits=memory=4Gi,cpu=2 --requests=memory=2Gi,cpu=500m -n ${GUID}-jenkins
 
 # Create custom agent container image with skopeo
 # TBD
@@ -26,7 +26,7 @@ oc new-build -D $'FROM docker.io/openshift/jenkins-agent-maven-35-centos7:v3.11\
 
 # Create pipeline build config pointing to the ${REPO} with contextDir `openshift-tasks`
 # TBD
-oc new-build --strategy=pipeline --code=${REPO} -e GUID=${GUID} -e REPO={$REPO} -e CLUSTER=${CLUSTER} --context-dir=openshift-tasks --name jenkinspipe
+oc new-build --strategy=pipeline --code=${REPO} -e GUID=${GUID} -e REPO={$REPO} -e CLUSTER=${CLUSTER} --context-dir=openshift-tasks --name jenkinspipe -n ${GUID}-jenkins
 
 
 # Make sure that Jenkins is fully up and running before proceeding!
