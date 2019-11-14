@@ -49,28 +49,28 @@ podTemplate(
       // TBD: The next two stages should run in parallel
 
     stage('running Unit Tests and Sonar in parallel') {
-        steps {
-            parallel(
-                Unit_Test: {
-                    echo "Running Unit Tests"
-                    sh "${mvnCmd} test"
-                    step([$class: 'JUnitResultArchiver', testResults: '**/openshift-tasks/target/surefire-reports/TEST-*.xml'])
-                },
-                Code_Analysis: {
-                    echo "Running Code Analysis"
-
-                    sh "${mvnCmd} sonar:sonar -Dsonar.host.url=http://sonarqube-gpte-hw-cicd.apps.na311.openshift.opentlc.com -Dsonar.projectName=${JOB_BASE_NAME} -Dsonar.projectVersion=${devTag}"
-                }
-            )
-        }
+//         steps {
+//             parallel(
+//                 Unit_Test: {
+//                     echo "Running Unit Tests"
+//                     sh "${mvnCmd} test"
+//                     step([$class: 'JUnitResultArchiver', testResults: '**/openshift-tasks/target/surefire-reports/TEST-*.xml'])
+//                 },
+//                 Code_Analysis: {
+//                     echo "Running Code Analysis"
+// 
+//                     sh "${mvnCmd} sonar:sonar -Dsonar.host.url=http://sonarqube-gpte-hw-cicd.apps.na311.openshift.opentlc.com -Dsonar.projectName=${JOB_BASE_NAME} -Dsonar.projectVersion=${devTag}"
+//                 }
+//             )
+//         }
     }
 
       // Publish the built war file to Nexus
       stage('Publish to Nexus') {
-        echo "Publish to Nexus"
-
-        // TBD: Publish to Nexus
-        sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::http://nexus3.gpte-hw-cicd.svc.cluster.local:8081/repository/releases"
+//         echo "Publish to Nexus"
+// 
+//         TBD: Publish to Nexus
+//         sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::http://nexus3.gpte-hw-cicd.svc.cluster.local:8081/repository/releases"
       }
 
       // Build the OpenShift Image in OpenShift and tag it.
@@ -78,14 +78,14 @@ podTemplate(
         echo "Building OpenShift container image tasks:${devTag}"
 
         // TBD: Build Image, tag Image
-        script {
-            openshift.withCluster() {
-                openshift.withProject("${devProject}") {
-                    openshift.selector("bc", "tasks").startBuild("--from-file=./openshift-tasks/target/openshift-tasks.war", "--wait=true")
-                    openshift.tag("tasks:latest", "tasks:${devTag}")
-                }
-            }
-        }
+//         script {
+//             openshift.withCluster() {
+//                 openshift.withProject("${devProject}") {
+//                     openshift.selector("bc", "tasks").startBuild("--from-file=./openshift-tasks/target/openshift-tasks.war", "--wait=true")
+//                     openshift.tag("tasks:latest", "tasks:${devTag}")
+//                 }
+//             }
+//         }
       }
 
       // Deploy the built image to the Development Environment.
@@ -95,42 +95,42 @@ podTemplate(
         // TBD: Deploy to development Project
         //      Set Image, Set VERSION
         //      Make sure the application is running and ready before proceeding
-            script {
-                // Update the Image on the Development Deployment Config
-                openshift.withCluster() {
-                    openshift.withProject("${devProject}") {
-                        openshift.set("image", "dc/tasks", "tasks=docker-registry.default.svc:5000/${devProject}/tasks:${devTag}")
-
-                        openshift.selector('configmap', 'tasks-config').delete()
-                        def configmap = openshift.create('configmap', 'tasks-config', '--from-file=./openshift-tasks/configuration/application-users.properties', '--from-file=./openshift-tasks/configuration/application-roles.properties' )
-
-                        // Deploy the development application.
-                        openshift.selector("dc", "tasks").rollout().latest();
-
-                        // Wait for application to be deployed
-                        def dc = openshift.selector("dc", "tasks").object()
-                        def dc_version = dc.status.latestVersion
-                        def rc = openshift.selector("rc", "tasks-${dc_version}").object()
-
-                        echo "Waiting for ReplicationController tasks-${dc_version} to be ready"
-                        while (rc.spec.replicas != rc.status.readyReplicas) {
-                            sleep 5
-                            rc = openshift.selector("rc", "tasks-${dc_version}").object()
-                        }
-                    }
-                }
-            }
+//             script {
+//                 Update the Image on the Development Deployment Config
+//                 openshift.withCluster() {
+//                     openshift.withProject("${devProject}") {
+//                         openshift.set("image", "dc/tasks", "tasks=docker-registry.default.svc:5000/${devProject}/tasks:${devTag}")
+// 
+//                         openshift.selector('configmap', 'tasks-config').delete()
+//                         def configmap = openshift.create('configmap', 'tasks-config', '--from-file=./openshift-tasks/configuration/application-users.properties', '--from-file=./openshift-tasks/configuration/application-roles.properties' )
+// 
+//                         Deploy the development application.
+//                         openshift.selector("dc", "tasks").rollout().latest();
+// 
+//                         Wait for application to be deployed
+//                         def dc = openshift.selector("dc", "tasks").object()
+//                         def dc_version = dc.status.latestVersion
+//                         def rc = openshift.selector("rc", "tasks-${dc_version}").object()
+// 
+//                         echo "Waiting for ReplicationController tasks-${dc_version} to be ready"
+//                         while (rc.spec.replicas != rc.status.readyReplicas) {
+//                             sleep 5
+//                             rc = openshift.selector("rc", "tasks-${dc_version}").object()
+//                         }
+//                     }
+//                 }
+//             }
       }
 
       // Copy Image to Nexus container registry
       stage('Copy Image to Nexus container registry') {
         echo "Copy image to Nexus container registry"
         script {
-            // TBD: Copy image to Nexus container registry
+            TBD: Copy image to Nexus container registry
             sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:redhat docker://docker-registry.default.svc:5000/${devProject}/tasks:${devTag} docker://nexus3-registry.gpte-hw-cicd.svc.cluster.local:5000/tasks:${devTag}"
 
 
-            // TBD: Tag the built image with the production tag.
+            TBD: Tag the built image with the production tag.
             openshift.withCluster() {
                 openshift.withProject("${prodProject}") {
                     openshift.tag("${devProject}/tasks:${devTag}", "${devProject}/tasks:${prodTag}")
@@ -152,7 +152,7 @@ podTemplate(
         //      Set Image, Set VERSION
         //      Deploy into the other application
         //      Make sure the application is running and ready before proceeding
-        script {
+/*        script {
             openshift.withCluster() {
                 openshift.withProject("${prodProject}") {
                     activeApp = openshift.selector("route", "tasks").object().spec.to.name
@@ -162,22 +162,22 @@ podTemplate(
                     echo "Active Application:      " + activeApp
                     echo "Destination Application: " + destApp
 
-                    // Update the Image on the Production Deployment Config
+                    Update the Image on the Production Deployment Config
                     def dc = openshift.selector("dc/${destApp}").object()
 
-                    // OpenShift 3
+                    OpenShift 3
                     dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${prodTag}"
 
                     openshift.apply(dc)
 
-                    // Update Config Map in change config files changed in the source
+                    Update Config Map in change config files changed in the source
                     openshift.selector("configmap", "${destApp}-config").delete()
                     def configmap = openshift.create("configmap", "${destApp}-config", "--from-file=./openshift-tasks/configuration/application-users.properties", "--from-file=./openshift-tasks/configuration/application-roles.properties" )
 
-                    // Deploy the inactive application.
+                    Deploy the inactive application.
                     openshift.selector("dc", "${destApp}").rollout().latest();
 
-                    // Wait for application to be deployed
+                    Wait for application to be deployed
                     def dc_prod = openshift.selector("dc", "${destApp}").object()
                     def dc_version = dc_prod.status.latestVersion
                     def rc_prod = openshift.selector("rc", "${destApp}-${dc_version}").object()
@@ -188,21 +188,21 @@ podTemplate(
                     }
                 }
             }
-        }        
+        } */       
       }
 
       stage('Switch over to new Version') {
         echo "Switching Production application to ${destApp}."
         // TBD: Execute switch
-        script {
-            openshift.withCluster() {
-                openshift.withProject("${prodProject}") {
-                    def route = openshift.selector("route/tasks").object()
-                    route.spec.to.name="${destApp}"
-                    openshift.apply(route)
-                }
-            }
-        }
+//         script {
+//             openshift.withCluster() {
+//                 openshift.withProject("${prodProject}") {
+//                     def route = openshift.selector("route/tasks").object()
+//                     route.spec.to.name="${destApp}"
+//                     openshift.apply(route)
+//                 }
+//             }
+//         }
 
       }
     }
