@@ -43,11 +43,27 @@ podTemplate(
         echo "Building version ${devTag}"
 
         // TBD: Execute Maven Build
-         sh "${mvnCmd} clean package -DskipTests=true"
+        sh "${mvnCmd} clean package -DskipTests=true"
       }
 
       // TBD: The next two stages should run in parallel
+      stage('running Unit Tests and Sonar in parallel') {
+        steps {
+          parallel(
+            Unit_Test: {
+              echo "Running Unit Tests"
+                sh "${mvnCmd} test"
+                    step([$class: 'JUnitResultArchiver', testResults: '**/openshift-tasks/target/surefire-reports/TEST-*.xml'])
+            },
+            Code_Analysis: {
+              echo "Running Code Analysis"
 
+              sh "${mvnCmd} sonar:sonar -Dsonar.host.url=http://sonarqube-gpte-hw-cicd.apps.na311.openshift.opentlc.com -Dsonar.projectName=${JOB_BASE_NAME} -Dsonar.projectVersion=${devTag}"
+            }
+          )
+        }
+      }
+      
       // Using Maven run the unit tests
       stage('Unit Tests') {
         echo "Running Unit Tests"
