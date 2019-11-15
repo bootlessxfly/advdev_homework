@@ -107,7 +107,7 @@ podTemplate(
                         Deploy the development application.
                         openshift.selector("dc", "tasks").rollout().latest();
 
-                        Wait for application to be deployed
+                        //Wait for application to be deployed
                         def dc = openshift.selector("dc", "tasks").object()
                         def dc_version = dc.status.latestVersion
                         def rc = openshift.selector("rc", "tasks-${dc_version}").object()
