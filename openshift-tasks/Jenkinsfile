@@ -1,4 +1,8 @@
 #!groovy
+//Declare project variables
+def devProject = "${GUID}-tasks-dev"
+def prodProject = "${GUID}-tasks-prod"
+
 podTemplate(
   label: "skopeo-pod",
   cloud: "openshift",
