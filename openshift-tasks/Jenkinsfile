@@ -53,7 +53,7 @@ podTemplate(
             Unit_Test: {
               echo "Running Unit Tests"
                 sh "${mvnCmd} test"
-                    step([$class: 'JUnitResultArchiver', testResults: '**/openshift-tasks/target/surefire-reports/TEST-*.xml'])
+                    step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
             },
             Code_Analysis: {
               echo "Running Code Analysis"
@@ -80,7 +80,7 @@ podTemplate(
         script {
           openshift.withCluster() {
             openshift.withProject("${devProject}") {
-                openshift.selector("bc", "tasks").startBuild("--from-file=./openshift-tasks/target/openshift-tasks.war", "--wait=true")
+                openshift.selector("bc", "tasks").startBuild("--from-file=./target/openshift-tasks.war", "--wait=true")
                 openshift.tag("tasks:latest", "tasks:${devTag}")
             }
           }
