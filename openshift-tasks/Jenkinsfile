@@ -104,7 +104,7 @@ podTemplate(
             openshift.withProject("$devProject") {
               openshift.set("image", "dc/tasks", "tasks=docker-registry.default.svc:5000/${devProject}/tasks:${devTag}")
               
-              openshift.selector('configmap', 'task-config').delete()
+              openshift.selector('configmap', 'tasks-config').delete()
               def configmap = openshift.create('configmap', 'tasks-config', '--from-file=./openshift-tasks/configuration/application-users.properties', '--from-file=./openshift-tasks/configuration/application-roles.properties' )
               
               // Deploy the development application
