@@ -169,7 +169,7 @@ podTemplate(
             openshift.apply(dc)
             
             // Update config map in change config files changed in the source
-            //openshift.selector("configmap", "${destApp}-config").delete()
+            openshift.selector("configmap", "${destApp}-config").delete()
             
             def configmap = openshift.create("configmap", "${destApp}-config", "--from-file=./configuration/application-users.properties", "--from-file=./configuration/application-roles.properties" )
             
