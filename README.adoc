@@ -10,3 +10,15 @@ This is an example JEE application to be used in the Advanced OpenShift Developm
 You are expected to clone this repository into your own public repository (GitHub, Gogs, Gitlab). This repository needs to be accessible to the instructor.
 
 Your Homework assignment will be graded by executing the pipeline at https://github.com/redhat-gpte-devopsautomation/advdev_homework_grading.
+
+# Commands used for testing:
+* ./setup_projects.sh 4b6d chwhite-redhat.com false
+* ./setup_jenkins.sh 4b6d https://github.com/bootlessxfly/advdev_homework.git na311.openshift.opentlc.com
+* ./setup_dev.sh 4b6d
+* ./setup_prod.sh 4b6d
+* oc project 4b6d-jenkins
+# Make sure to run the following twice to simulate the grading pipeline
+* oc start-build tasks-pipeline
+* oc start-build tasks-pipeline
+# Get the pipelines logs
+* oc logs bc/tasks-pipeline
