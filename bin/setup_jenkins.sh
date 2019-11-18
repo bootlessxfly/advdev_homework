@@ -26,33 +26,33 @@ oc new-build -D $'FROM docker.io/openshift/jenkins-agent-maven-35-centos7:v3.11\
 
 # Create pipeline build config pointing to the ${REPO} with contextDir `openshift-tasks`
 # For some reason using new-build does not work, using oc create instead :(
-# oc new-build --strategy=pipeline --code=${REPO} -e GUID=${GUID} -e REPO=${REPO} -e CLUSTER=${CLUSTER} --context-dir=openshift-tasks --name tasks-pipeline -n ${GUID}-jenkins
-echo "apiVersion: v1
-items:
-- kind: "BuildConfig"
-  apiVersion: "v1"
-  metadata:
-    name: "tasks-pipeline"
-  spec:
-    source:
-      type: "Git"
-      git:
-        uri: ${REPO}
-      contextDir: "openshift-tasks"
-    strategy:
-      type: "JenkinsPipeline"
-      jenkinsPipelineStrategy:
-        jenkinsfilePath: Jenkinsfile
-        env:
-        - name: "GUID"
-          value: ${GUID}
-        - name: "REPO"
-          value: ${REPO}
-        - name: "CLUSTER"
-          value: ${CLUSTER}
-    triggers: []
-kind: List
-metadata: []" | oc create -f - -n ${GUID}-jenkins
+oc new-build --strategy=pipeline --code=${REPO} -e GUID=${GUID} -e REPO=${REPO} -e CLUSTER=${CLUSTER} --context-dir=openshift-tasks --name tasks-pipeline -n ${GUID}-jenkins
+# echo "apiVersion: v1
+# items:
+# - kind: "BuildConfig"
+#   apiVersion: "v1"
+#   metadata:
+#     name: "tasks-pipeline"
+#   spec:
+#     source:
+#       type: "Git"
+#       git:
+#         uri: ${REPO}
+#       contextDir: "openshift-tasks"
+#     strategy:
+#       type: "JenkinsPipeline"
+#       jenkinsPipelineStrategy:
+#         jenkinsfilePath: Jenkinsfile
+#         env:
+#         - name: "GUID"
+#           value: ${GUID}
+#         - name: "REPO"
+#           value: ${REPO}
+#         - name: "CLUSTER"
+#           value: ${CLUSTER}
+#     triggers: []
+# kind: List
+# metadata: []" | oc create -f - -n ${GUID}-jenkins
 
 
 # Make sure that Jenkins is fully up and running before proceeding!
