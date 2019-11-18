@@ -106,7 +106,7 @@ podTemplate(
               
               openshift.selector('configmap', 'tasks-config').delete()
               def configmap = openshift.create('configmap', 'tasks-config', '--from-file=./configuration/application-users.properties', '--from-file=./configuration/application-roles.properties' )
-              
+              openshift.set("env dc/tasks VERSION='${devTag} (tasks-dev)' -n ${GUID}-tasks-dev")
               // Deploy the development application
               openshift.selector("dc", "tasks").rollout().latest()
               
@@ -172,7 +172,7 @@ podTemplate(
             openshift.selector("configmap", "${destApp}-config").delete()
             
             def configmap = openshift.create("configmap", "${destApp}-config", "--from-file=./configuration/application-users.properties", "--from-file=./configuration/application-roles.properties" )
-            
+            openshift.set("env dc/${destApp} VERSION='${prodTag} ($destApp)' -n ${GUID}-tasks-dev")
             // Deploy the inactive app
             openshift.selector("dc", "${destApp}").rollout().latest();
             
