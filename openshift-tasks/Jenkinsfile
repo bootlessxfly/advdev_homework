@@ -172,7 +172,7 @@ podTemplate(
             openshift.selector("configmap", "${destApp}-config").delete()
             
             def configmap = openshift.create("configmap", "${destApp}-config", "--from-file=./configuration/application-users.properties", "--from-file=./configuration/application-roles.properties" )
-            openshift.set("env dc/${destApp} VERSION='${prodTag} (${destApp})' -n ${GUID}-tasks-dev")
+            openshift.set("env dc/${destApp} VERSION='${prodTag} (${destApp})' -n ${GUID}-tasks-prod")
             // Deploy the inactive app
             openshift.selector("dc", "${destApp}").rollout().latest();
             
